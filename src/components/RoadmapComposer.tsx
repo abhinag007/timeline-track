@@ -18,6 +18,7 @@ import {
   X,
 } from "lucide-react";
 import { useEffect, useRef, useState, useTransition } from "react";
+import { openClaudeKeyDialog } from "@/components/ClaudeKey";
 import { analyzeRoadmap, saveRoadmap } from "@/app/actions";
 import { addDays, formatDay } from "@/lib/dates";
 import type { RoadmapProposal } from "@/lib/roadmap";
@@ -112,7 +113,10 @@ export default function RoadmapComposer({ today }: { today: string }) {
       const result = await analyzeRoadmap(
         upload ? { startDate, pdf: { name: upload.name, base64: upload.base64 } } : { startDate, text },
       );
-      if ("error" in result) return setError(result.error);
+      if ("error" in result) {
+        if (result.needKey) openClaudeKeyDialog();
+        return setError(result.error);
+      }
       setTitle(result.proposal.title);
       setSummary(result.proposal.summary);
       setPhases(toDrafts(result.proposal));

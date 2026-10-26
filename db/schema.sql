@@ -9,8 +9,12 @@ create table users (
   password_hash text not null,
   timezone text not null default 'UTC',
   day_cutoff_hour smallint not null default 4 check (day_cutoff_hour between 0 and 12),
+  -- Demo sandboxes: created from the login page, deleted once expires_at passes.
+  is_demo boolean not null default false,
+  expires_at timestamptz,
   created_at timestamptz not null default now()
 );
+create index users_demo_expiry_idx on users (expires_at) where is_demo;
 
 create table categories (
   id uuid primary key default gen_random_uuid(),

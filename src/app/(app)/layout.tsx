@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Suspense } from "react";
 import { logout } from "@/app/actions";
 import { SidebarNav, SidebarNavList, TabBar, TabBarList } from "@/components/NavLinks";
+import { DemoKeyButton, DemoKeyDialog } from "@/components/DemoKey";
 import { LogoTile } from "@/components/Logo";
 import { PageSkeleton } from "@/components/ui";
 import SubmitButton from "@/components/SubmitButton";
@@ -35,6 +36,9 @@ export default function AppLayout({ children }: LayoutProps<"/">) {
         </Suspense>
 
         <div className="mt-auto space-y-3">
+          <Suspense>
+            <DemoKeyButton />
+          </Suspense>
           <div className="card-flat p-4">
             <p className="text-sm font-medium">End-of-day ritual</p>
             <p className="mt-1 text-xs leading-relaxed text-muted">Write one messy paragraph. Claude turns it into done items, to-dos and events.</p>
@@ -55,6 +59,9 @@ export default function AppLayout({ children }: LayoutProps<"/">) {
         <header className="sticky top-0 z-20 flex items-center justify-between border-b border-line bg-bg/80 px-4 py-3 backdrop-blur-xl lg:hidden">
           <Logo />
           <div className="flex items-center gap-1">
+            <Suspense>
+              <DemoKeyButton compact />
+            </Suspense>
             <ThemeToggle />
             <form action={logout}>
               <SubmitButton className="icon-btn" title="Sign out" aria-label="Sign out">
@@ -71,6 +78,9 @@ export default function AppLayout({ children }: LayoutProps<"/">) {
 
       <Suspense fallback={<TabBarList pathname={null} />}>
         <TabBar />
+      </Suspense>
+      <Suspense>
+        <DemoKeyDialog />
       </Suspense>
     </div>
   );

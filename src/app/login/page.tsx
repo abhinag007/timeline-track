@@ -1,8 +1,8 @@
 "use client";
 
-import { ArrowRight, CalendarClock, CheckCircle2, Circle, Loader2 } from "lucide-react";
+import { ArrowRight, CalendarClock, CheckCircle2, Circle, Loader2, Sparkles } from "lucide-react";
 import { useActionState } from "react";
-import { login } from "@/app/actions";
+import { login, startDemo } from "@/app/actions";
 import { LogoTile } from "@/components/Logo";
 import ThemeToggle from "@/components/ThemeToggle";
 
@@ -15,6 +15,7 @@ const SAMPLE = [
 
 export default function LoginPage() {
   const [state, action, pending] = useActionState(login, undefined);
+  const [demoState, demoAction, demoPending] = useActionState(startDemo, undefined);
   return (
     <div className="grid min-h-dvh flex-1 lg:grid-cols-2">
       <div className="relative hidden overflow-hidden border-r border-white/5 bg-[#111110] p-12 text-[#eeeeec] lg:flex lg:flex-col">
@@ -45,31 +46,56 @@ export default function LoginPage() {
 
       <main className="relative flex items-center justify-center px-5 py-12">
         <ThemeToggle className="icon-btn absolute top-4 right-4" />
-        <form action={action} className="w-full max-w-sm space-y-6">
-          <div>
-            <div className="mb-6 lg:hidden">
-              <LogoTile size="lg" />
+        <div className="w-full max-w-sm space-y-6">
+          <form action={action} className="space-y-6">
+            <div>
+              <div className="mb-6 lg:hidden">
+                <LogoTile size="lg" />
+              </div>
+              <h2 className="text-2xl font-semibold tracking-tight">Welcome back</h2>
+              <p className="mt-1 text-sm text-muted">Sign in to log your day.</p>
             </div>
-            <h2 className="text-2xl font-semibold tracking-tight">Welcome back</h2>
-            <p className="mt-1 text-sm text-muted">Sign in to log your day.</p>
+            <div className="space-y-4">
+              <label className="block">
+                <span className="label">Email</span>
+                <input name="email" type="email" required placeholder="you@example.com" autoComplete="email" className="input py-3" />
+              </label>
+              <label className="block">
+                <span className="label">Password</span>
+                <input name="password" type="password" required placeholder="••••••••" autoComplete="current-password" className="input py-3" />
+              </label>
+            </div>
+            {state?.error && <p className="rounded-xl bg-rose-500/10 px-4 py-3 text-sm text-rose-600 dark:text-rose-400">{state.error}</p>}
+            <button className="btn w-full py-3" disabled={pending}>
+              {pending ? <Loader2 className="size-4 animate-spin" /> : null}
+              {pending ? "Signing in…" : "Sign in"}
+              {!pending && <ArrowRight className="size-4" />}
+            </button>
+          </form>
+
+          <div className="flex items-center gap-3 text-xs text-faint">
+            <span className="h-px flex-1 bg-line" />
+            or
+            <span className="h-px flex-1 bg-line" />
           </div>
-          <div className="space-y-4">
-            <label className="block">
-              <span className="label">Email</span>
-              <input name="email" type="email" required placeholder="you@example.com" autoComplete="email" className="input py-3" />
-            </label>
-            <label className="block">
-              <span className="label">Password</span>
-              <input name="password" type="password" required placeholder="••••••••" autoComplete="current-password" className="input py-3" />
-            </label>
-          </div>
-          {state?.error && <p className="rounded-xl bg-rose-500/10 px-4 py-3 text-sm text-rose-600 dark:text-rose-400">{state.error}</p>}
-          <button className="btn w-full py-3" disabled={pending}>
-            {pending ? <Loader2 className="size-4 animate-spin" /> : null}
-            {pending ? "Signing in…" : "Sign in"}
-            {!pending && <ArrowRight className="size-4" />}
-          </button>
-        </form>
+
+          <form
+            action={demoAction}
+            onSubmit={(e) => {
+              const tz = e.currentTarget.elements.namedItem("tz") as HTMLInputElement;
+              tz.value = Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC";
+            }}
+            className="space-y-3"
+          >
+            <input type="hidden" name="tz" defaultValue="UTC" />
+            <button className="btn-secondary w-full py-3" disabled={demoPending}>
+              {demoPending ? <Loader2 className="size-4 animate-spin" /> : <Sparkles className="size-4" />}
+              {demoPending ? "Setting up your demo…" : "Try the demo"}
+            </button>
+            <p className="text-center text-xs text-faint">A private sandbox with sample data, deleted after 24 hours. Bring your own Claude API key.</p>
+            {demoState?.error && <p className="rounded-xl bg-rose-500/10 px-4 py-3 text-sm text-rose-600 dark:text-rose-400">{demoState.error}</p>}
+          </form>
+        </div>
       </main>
     </div>
   );

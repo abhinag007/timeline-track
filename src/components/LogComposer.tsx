@@ -17,6 +17,7 @@ import {
   Trash2,
 } from "lucide-react";
 import { useState, useTransition } from "react";
+import { openClaudeKeyDialog } from "@/components/ClaudeKey";
 import { analyzeLog, saveEntry } from "@/app/actions";
 import type { ChecklistItem, OpenItem, Project, RoadmapStep } from "@/lib/data";
 import { formatDay } from "@/lib/dates";
@@ -88,6 +89,7 @@ export default function LogComposer({ defaultDate, categories, projects, openIte
       const result = await analyzeLog(text, date);
       if ("error" in result) {
         setError(result.error);
+        if (result.needKey) openClaudeKeyDialog();
         return;
       }
       setDrafts(result.proposal.items.map(toDraft));

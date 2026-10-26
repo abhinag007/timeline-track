@@ -94,15 +94,15 @@ function contextBlock(ctx: SplitContext): string {
   );
 }
 
-let client: Anthropic | null = null;
-
-export class SplitError extends Error {}
-
-export async function splitLog(text: string, ctx: SplitContext): Promise<Proposal> {
-  if (!process.env.ANTHROPIC_API_KEY) {
-    throw new SplitError("Add your Anthropic API key as ANTHROPIC_API_KEY in app/.env.local, then restart the app.");
+// badKey: Claude rejected the API key, so the caller can ask for a new one.
+export class SplitError extends Error {
+  constructor(message: string, readonly badKey = false) {
+    super(message);
   }
-  client ??= new Anthropic();
+}
+
+export async function splitLog(text: string, ctx: SplitContext, apiKey: string): Promise<Proposal> {
+  const client = new Anthropic({ apiKey });
   let response;
   try {
     response = await client.beta.messages.parse({
@@ -121,7 +121,7 @@ export async function splitLog(text: string, ctx: SplitContext): Promise<Proposa
     });
   } catch (error) {
     if (error instanceof Anthropic.AuthenticationError) {
-      throw new SplitError("The Anthropic API key is missing or invalid. Set ANTHROPIC_API_KEY in .env.local.");
+      throw new SplitError("Claude rejected the API key. Check that it's correct and still active.", true);
     }
     if (error instanceof Anthropic.RateLimitError) {
       throw new SplitError("Claude is rate limited right now. Try again in a minute.");

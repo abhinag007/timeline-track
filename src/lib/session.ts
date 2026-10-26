@@ -11,11 +11,14 @@ const key = new TextEncoder().encode(process.env.SESSION_SECRET);
 
 // The token carries the user's timezone and day cutoff so pages can work out
 // "today" without a database round trip first.
-type Session = { userId: string; tz?: string; cutoff?: number };
+type Session = { userId: string; tz?: string; cutoff?: number; demo?: boolean };
 
-export async function createSession(user: { id: string; timezone: string; day_cutoff_hour: number }) {
-  const expiresAt = new Date(Date.now() + MAX_AGE_DAYS * 86_400_000);
-  const token = await new SignJWT({ userId: user.id, tz: user.timezone, cutoff: user.day_cutoff_hour } satisfies Session)
+// Demo sessions end when their sandbox account is deleted (demoUntil).
+export async function createSession(user: { id: string; timezone: string; day_cutoff_hour: number }, opts: { demoUntil?: Date } = {}) {
+  const expiresAt = opts.demoUntil ?? new Date(Date.now() + MAX_AGE_DAYS * 86_400_000);
+  const payload: Session = { userId: user.id, tz: user.timezone, cutoff: user.day_cutoff_hour };
+  if (opts.demoUntil) payload.demo = true;
+  const token = await new SignJWT(payload)
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
     .setExpirationTime(expiresAt)
@@ -35,7 +38,7 @@ export async function deleteSession() {
   cookieStore.delete(COOKIE);
 }
 
-async function readSession(): Promise<Session | null> {
+export async function getSession(): Promise<Session | null> {
   const token = (await cookies()).get(COOKIE)?.value;
   if (!token) return null;
   try {
@@ -45,14 +48,15 @@ async function readSession(): Promise<Session | null> {
       userId: payload.userId,
       tz: typeof payload.tz === "string" ? payload.tz : undefined,
       cutoff: typeof payload.cutoff === "number" ? payload.cutoff : undefined,
+      demo: payload.demo === true,
     };
   } catch {
     return null;
   }
 }
 
-async function requireSession(): Promise<Session> {
-  const session = await readSession();
+export async function requireSession(): Promise<Session> {
+  const session = await getSession();
   if (!session) redirect("/login");
   return session;
 }

@@ -1,6 +1,7 @@
 "use server";
 
 import { randomUUID } from "node:crypto";
+import Anthropic from "@anthropic-ai/sdk";
 import bcrypt from "bcryptjs";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
@@ -15,7 +16,9 @@ import {
   getRoadmapSteps,
   getTagNames,
 } from "@/lib/data";
-import { createSession, deleteSession, requireToday, requireUserId } from "@/lib/session";
+import { claudeKeyForRequest, clearDemoKey, storeDemoKey } from "@/lib/claude-key";
+import { createDemoUser, deleteDemoUser, DemoError, safeTimezone } from "@/lib/demo";
+import { createSession, deleteSession, getSession, requireSession, requireToday, requireUserId } from "@/lib/session";
 import { extractRoadmap, RoadmapError, type RoadmapProposal, type RoadmapSource } from "@/lib/roadmap";
 import { ProposalSchema, SplitError, splitLog, type Proposal } from "@/lib/split";
 
@@ -36,13 +39,66 @@ export async function login(_state: LoginState, formData: FormData): Promise<Log
 }
 
 export async function logout() {
+  const session = await getSession();
+  if (session?.demo) {
+    await deleteDemoUser(session.userId);
+    await clearDemoKey();
+  }
   await deleteSession();
   redirect("/login");
 }
 
+// ---------- demo ----------
+
+export async function startDemo(_state: LoginState, formData: FormData): Promise<LoginState> {
+  // Starting over replaces the visitor's previous sandbox.
+  const previous = await getSession();
+  if (previous?.demo) await deleteDemoUser(previous.userId);
+  let user;
+  try {
+    user = await createDemoUser(safeTimezone(String(formData.get("tz") ?? "UTC")));
+  } catch (error) {
+    if (error instanceof DemoError) return { error: error.message };
+    throw error;
+  }
+  await clearDemoKey();
+  await createSession(user, { demoUntil: user.expiresAt });
+  redirect("/");
+}
+
+export type ClaudeKeyState = { error?: string; ok?: boolean } | undefined;
+
+export async function saveClaudeKey(_state: ClaudeKeyState, formData: FormData): Promise<ClaudeKeyState> {
+  const session = await requireSession();
+  if (!session.demo) return { error: "Your account uses the API key set on the server." };
+  const apiKey = String(formData.get("key") ?? "").trim();
+  if (!/^sk-ant-[\w-]{20,}$/.test(apiKey)) return { error: "That doesn't look like an Anthropic API key. It starts with sk-ant-." };
+  try {
+    // A free call that only succeeds with a working key.
+    await new Anthropic({ apiKey }).models.list({ limit: 1 });
+  } catch (error) {
+    if (error instanceof Anthropic.AuthenticationError || error instanceof Anthropic.PermissionDeniedError) {
+      return { error: "Claude didn't accept that key. Check it and try again." };
+    }
+    if (error instanceof Anthropic.APIError) return { error: `Couldn't check the key (${error.status}). Try again in a moment.` };
+    throw error;
+  }
+  const [user] = await sql`select expires_at from users where id = ${session.userId} and is_demo`;
+  if (!user) redirect("/login");
+  await storeDemoKey(session.userId, apiKey, new Date(user.expires_at as string));
+  revalidatePath("/", "layout");
+  return { ok: true };
+}
+
+export async function removeClaudeKey() {
+  await clearDemoKey();
+  revalidatePath("/", "layout");
+}
+
 // ---------- log splitting ----------
 
-export type AnalyzeResult = { proposal: Proposal } | { error: string };
+// needKey: the demo has no working Claude key, so the page should ask for one.
+export type AnalyzeResult = { proposal: Proposal } | { error: string; needKey?: boolean };
 
 export async function analyzeLog(text: string, entryDate: string): Promise<AnalyzeResult> {
   const userId = await requireUserId();
@@ -57,11 +113,13 @@ export async function analyzeLog(text: string, entryDate: string): Promise<Analy
     getRoadmapSteps(userId),
     getOpenChecklistItems(userId),
   ]);
+  const key = await claudeKeyForRequest();
+  if ("error" in key) return { error: key.error, needKey: key.needKey };
   try {
-    const proposal = await splitLog(text, { entryDate, categories, tags, projects, openItems, steps, checklist });
+    const proposal = await splitLog(text, { entryDate, categories, tags, projects, openItems, steps, checklist }, key.apiKey);
     return { proposal };
   } catch (error) {
-    if (error instanceof SplitError) return { error: error.message };
+    if (error instanceof SplitError) return { error: error.message, needKey: error.badKey || undefined };
     console.error(error);
     return { error: "Something went wrong while splitting your log." };
   }
@@ -224,7 +282,7 @@ const MAX_TEXT_CHARS = 600_000;
 const MAX_PDF_BASE64 = 11_000_000; // about 8 MB of PDF
 
 export type AnalyzeRoadmapInput = { startDate: string; text?: string; pdf?: { name: string; base64: string } };
-export type AnalyzeRoadmapResult = { proposal: RoadmapProposal } | { error: string };
+export type AnalyzeRoadmapResult = { proposal: RoadmapProposal } | { error: string; needKey?: boolean };
 
 export async function analyzeRoadmap(input: AnalyzeRoadmapInput): Promise<AnalyzeRoadmapResult> {
   await requireUserId();
@@ -239,10 +297,12 @@ export async function analyzeRoadmap(input: AnalyzeRoadmapInput): Promise<Analyz
     if (text.length > MAX_TEXT_CHARS) return { error: "That document is too long for one roadmap. Split it into two." };
     source = { kind: "text", text };
   }
+  const key = await claudeKeyForRequest();
+  if ("error" in key) return { error: key.error, needKey: key.needKey };
   try {
-    return { proposal: await extractRoadmap(source, input.startDate) };
+    return { proposal: await extractRoadmap(source, input.startDate, key.apiKey) };
   } catch (error) {
-    if (error instanceof RoadmapError) return { error: error.message };
+    if (error instanceof RoadmapError) return { error: error.message, needKey: error.badKey || undefined };
     console.error(error);
     return { error: "Something went wrong while reading your document." };
   }

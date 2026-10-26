@@ -4,6 +4,8 @@
 
 Made for developers: side projects, open-source work, interview prep and learning plans, tracked from the way you already talk about your day.
 
+**[Try the live demo →](https://timeline-track-inky.vercel.app/login)** Click **Try the demo** for a private sandbox with two months of sample data. It is deleted after 24 hours or when you sign out. To split logs and import roadmaps, add your own [Anthropic API key](https://console.anthropic.com/settings/keys) in the dialog. It is stored encrypted in a cookie in your browser only, never in the database.
+
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fabhinag007%2Ftimeline-track&env=DATABASE_URL,SESSION_SECRET,ANTHROPIC_API_KEY&envDescription=Neon%20connection%20string%2C%20a%20random%20session%20secret%20and%20an%20Anthropic%20API%20key&envLink=https%3A%2F%2Fgithub.com%2Fabhinag007%2Ftimeline-track%23run-it-locally&project-name=timeline-track&repository-name=timeline-track)
 
 <picture>

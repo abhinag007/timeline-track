@@ -48,15 +48,15 @@ Rules:
 - Keep names, technologies and problem titles exactly as written.
 - The person will review and edit the roadmap before saving.`;
 
-let client: Anthropic | null = null;
-
-export class RoadmapError extends Error {}
-
-export async function extractRoadmap(source: RoadmapSource, startDate: string): Promise<RoadmapProposal> {
-  if (!process.env.ANTHROPIC_API_KEY) {
-    throw new RoadmapError("Add your Anthropic API key as ANTHROPIC_API_KEY in app/.env.local, then restart the app.");
+// badKey: Claude rejected the API key, so the caller can ask for a new one.
+export class RoadmapError extends Error {
+  constructor(message: string, readonly badKey = false) {
+    super(message);
   }
-  client ??= new Anthropic();
+}
+
+export async function extractRoadmap(source: RoadmapSource, startDate: string, apiKey: string): Promise<RoadmapProposal> {
+  const client = new Anthropic({ apiKey });
 
   const intro = `Start date: ${startDate}. Build the roadmap from the document below.`;
   const content: Anthropic.Beta.BetaContentBlockParam[] =
@@ -82,7 +82,7 @@ export async function extractRoadmap(source: RoadmapSource, startDate: string): 
     message = await stream.finalMessage();
   } catch (error) {
     if (error instanceof Anthropic.AuthenticationError) {
-      throw new RoadmapError("The Anthropic API key is missing or invalid. Set ANTHROPIC_API_KEY in .env.local.");
+      throw new RoadmapError("Claude rejected the API key. Check that it's correct and still active.", true);
     }
     if (error instanceof Anthropic.RateLimitError) {
       throw new RoadmapError("Claude is rate limited right now. Try again in a minute.");
