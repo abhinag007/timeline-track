@@ -1,8 +1,40 @@
 # Timeline Track
 
-A personal daily log you write as one messy paragraph at the end of the day. Claude splits it into **done items, to-dos and events**, each with a category, tags, project and roadmap step. You review and edit everything, then save it. Over time you get a timeline, project history, roadmap progress and a Markdown export for any date range.
+**A dev log that writes itself.** At the end of the day, type one messy paragraph about what you did. Claude splits it into **done items, to-dos and events**, tags each one with a category, project and roadmap step, and builds your timeline, project history and learning-roadmap progress from it. No boards to groom, no tickets to move.
 
-Built with Next.js 16, Neon Postgres, Tailwind CSS v4 and the Anthropic API (Claude Opus 5.5).
+Made for developers: side projects, open-source work, interview prep and learning plans, tracked from the way you already talk about your day.
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fabhinag007%2Ftimeline-track&env=DATABASE_URL,SESSION_SECRET,ANTHROPIC_API_KEY&envDescription=Neon%20connection%20string%2C%20a%20random%20session%20secret%20and%20an%20Anthropic%20API%20key&envLink=https%3A%2F%2Fgithub.com%2Fabhinag007%2Ftimeline-track%23run-it-locally&project-name=timeline-track&repository-name=timeline-track)
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/screenshots/review-dark.png">
+  <img alt="A messy end-of-day paragraph split into structured, editable items" src="docs/screenshots/review-light.png">
+</picture>
+
+Built with Next.js 16, Neon Postgres, Tailwind CSS v4 and the Anthropic API (Claude Opus 5.5). MIT licensed.
+
+## Screenshots
+
+**Timeline**: a GitHub-style activity heatmap, streaks, and every logged day.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/screenshots/timeline-dark.png">
+  <img alt="Timeline with activity heatmap and streaks" src="docs/screenshots/timeline-light.png">
+</picture>
+
+**Roadmaps**: paste or upload a plan; Claude turns it into phases, steps and checklists with target dates, and your daily logs tick them off.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/screenshots/roadmap-dark.png">
+  <img alt="Roadmap with phases, steps, checklists and schedule status" src="docs/screenshots/roadmap-light.png">
+</picture>
+
+**Projects**: history, open items, time logged and milestones for each project.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/screenshots/project-dark.png">
+  <img alt="Project page with history, open items and milestones" src="docs/screenshots/project-light.png">
+</picture>
 
 ## Features
 
@@ -56,7 +88,7 @@ Fill in `.env.local`:
 
 ### 5. Create your login
 
-There is no public sign-up. This script asks for an email and password and adds the 9 default categories:
+There is no public sign-up. This script asks for an email and password, adds the 9 default categories, and uses your machine's time zone:
 
 ```bash
 npm run create-user
@@ -78,7 +110,13 @@ Open http://localhost:3000 and sign in. If port 3000 is taken, run `npm run dev 
 
 ## Deploy
 
-The app needs a Node.js server (Server Actions and API routes), so it **can't run on GitHub Pages**. [Vercel](https://vercel.com) is the easiest host: import the repo, add the three environment variables, and deploy. Large PDF roadmap imports can take a minute or two, which fits within Vercel's default 300-second function limit.
+The app needs a Node.js server (Server Actions and API routes), so it **can't run on GitHub Pages**. [Vercel](https://vercel.com) is the easiest host:
+
+1. Click **Deploy with Vercel** at the top of this page. It copies the repo to your GitHub account and asks for the three environment variables from step 4.
+2. Create the tables and your login against the same database, from your machine: run [`db/schema.sql`](db/schema.sql) (step 3) and `npm run create-user` (step 5) with the same `DATABASE_URL` in `.env.local`.
+3. Sign in on your new `*.vercel.app` URL.
+
+For faster pages, run the functions in the region closest to your database: [`vercel.json`](vercel.json) sets `sin1` (Singapore), so change it to match your Neon region. Large PDF roadmap imports can take a minute or two, which fits within Vercel's default 300-second function limit.
 
 ## Project structure
 

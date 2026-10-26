@@ -28,9 +28,11 @@ if (!email || password.length < 8) {
   process.exit(1);
 }
 
+// "Today" is worked out in this time zone; it defaults to this machine's.
+const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC";
 const hash = await bcrypt.hash(password, 12);
 const [user] = await sql`
-  insert into users (email, password_hash) values (${email}, ${hash})
+  insert into users (email, password_hash, timezone) values (${email}, ${hash}, ${timezone})
   on conflict (email) do update set password_hash = excluded.password_hash
   returning id
 `;

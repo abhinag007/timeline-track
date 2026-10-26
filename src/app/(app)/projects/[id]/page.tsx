@@ -139,7 +139,7 @@ export default async function ProjectPage({ params }: PageProps<"/projects/[id]"
               ))}
             </ol>
             <form action={addMilestone.bind(null, project.id)} className="space-y-2 border-t border-line pt-4">
-              <input name="title" placeholder="e.g. Launched on X" className="input" required />
+              <input name="title" placeholder="e.g. v1.0 released" className="input" required />
               <div className="flex gap-2">
                 <input name="done_on" type="date" className="input flex-1" title="Leave empty if not reached yet" />
                 <SubmitButton className="btn-secondary">
