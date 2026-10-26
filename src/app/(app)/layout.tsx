@@ -1,20 +1,19 @@
-import { LogOut, Sparkles } from "lucide-react";
+import { LogOut } from "lucide-react";
 import Link from "next/link";
 import { Suspense } from "react";
 import { logout } from "@/app/actions";
 import { SidebarNav, SidebarNavList, TabBar, TabBarList } from "@/components/NavLinks";
+import { LogoTile } from "@/components/Logo";
 import { PageSkeleton } from "@/components/ui";
 import SubmitButton from "@/components/SubmitButton";
 
 function Logo() {
   return (
     <Link href="/" className="flex items-center gap-2.5">
-      <span className="gradient-accent flex size-9 items-center justify-center rounded-xl text-white shadow-card">
-        <Sparkles className="size-[18px]" strokeWidth={2.2} />
-      </span>
+      <LogoTile />
       <span className="leading-tight">
         <span className="block text-[15px] font-semibold tracking-tight">Timeline</span>
-        <span className="block text-xs text-faint">Daily log</span>
+        <span className="block text-xs text-faint">Track your days</span>
       </span>
     </Link>
   );

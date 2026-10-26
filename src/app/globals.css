@@ -1,37 +1,37 @@
 @import "tailwindcss";
 
+/* Radix Sand (warm neutral) + Radix Green (one accent). Neutral surfaces, ink for
+   primary actions, green only where something is "on": progress, today, focus. */
 :root {
   color-scheme: light dark;
-  --bg: #f4f4f1;
-  --surface: #ffffff;
-  --surface-2: #f7f7f4;
-  --line: #e7e6e1;
-  --line-strong: #d6d5cf;
-  --ink: #16161a;
-  --muted: #66666f;
-  --faint: #9b9ba3;
-  --accent: #5b4cf0;
-  --accent-2: #8b5cf6;
-  --accent-soft: #eeecfe;
-  --accent-ink: #3b2fc4;
-  --shadow: 0 1px 2px rgb(20 20 30 / 0.04), 0 12px 32px -16px rgb(20 20 30 / 0.12);
+  --bg: #f9f9f8;
+  --surface: #fdfdfc;
+  --surface-2: #f1f0ef;
+  --line: #e2e1de;
+  --line-strong: #cfceca;
+  --ink: #21201c;
+  --muted: #63635e;
+  --faint: #8d8d86;
+  --accent: #30a46c;
+  --accent-soft: #e6f6eb;
+  --accent-ink: #218358;
+  --shadow: 0 1px 2px rgb(33 32 28 / 0.05), 0 8px 24px -12px rgb(33 32 28 / 0.1);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg: #0b0b0f;
-    --surface: #131318;
-    --surface-2: #1a1a21;
-    --line: #24242d;
-    --line-strong: #33333e;
-    --ink: #ededf1;
-    --muted: #9d9da8;
-    --faint: #686873;
-    --accent: #8b80ff;
-    --accent-2: #b38cff;
-    --accent-soft: #1f1c3a;
-    --accent-ink: #c4beff;
-    --shadow: 0 1px 2px rgb(0 0 0 / 0.3), 0 12px 32px -16px rgb(0 0 0 / 0.6);
+    --bg: #111110;
+    --surface: #191918;
+    --surface-2: #222221;
+    --line: #31312e;
+    --line-strong: #494844;
+    --ink: #eeeeec;
+    --muted: #b5b3ad;
+    --faint: #7c7b74;
+    --accent: #3dd68c;
+    --accent-soft: #132d21;
+    --accent-ink: #3dd68c;
+    --shadow: 0 1px 2px rgb(0 0 0 / 0.4), 0 8px 24px -12px rgb(0 0 0 / 0.6);
   }
 }
 
@@ -45,7 +45,6 @@
   --color-muted: var(--muted);
   --color-faint: var(--faint);
   --color-accent: var(--accent);
-  --color-accent-2: var(--accent-2);
   --color-accent-soft: var(--accent-soft);
   --color-accent-ink: var(--accent-ink);
   --font-sans: var(--font-geist-sans);
@@ -75,10 +74,6 @@ body {
   @apply rounded-2xl border border-line bg-surface-2;
 }
 
-.gradient-accent {
-  background: linear-gradient(135deg, var(--accent), var(--accent-2));
-}
-
 /* ---------- form controls ---------- */
 
 .input {
@@ -87,7 +82,7 @@ body {
 
 .select {
   @apply w-full cursor-pointer appearance-none rounded-xl border border-line bg-surface py-2.5 pr-9 pl-3.5 text-sm text-ink outline-none transition hover:border-line-strong focus:border-accent focus:ring-4 focus:ring-accent/15;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' stroke='%239b9ba3' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m4 6 4 4 4-4'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' stroke='%238d8d86' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m4 6 4 4 4-4'/%3E%3C/svg%3E");
   background-position: right 0.75rem center;
   background-repeat: no-repeat;
 }
@@ -99,9 +94,7 @@ body {
 /* ---------- buttons ---------- */
 
 .btn {
-  @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-medium whitespace-nowrap text-white transition hover:brightness-110 active:scale-[0.98] disabled:pointer-events-none disabled:opacity-50;
-  background: linear-gradient(135deg, var(--accent), var(--accent-2));
-  box-shadow: 0 8px 20px -8px color-mix(in srgb, var(--accent) 70%, transparent);
+  @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-medium whitespace-nowrap bg-ink text-bg shadow-sm transition hover:opacity-85 active:scale-[0.98] disabled:pointer-events-none disabled:opacity-50;
 }
 
 .btn-secondary {

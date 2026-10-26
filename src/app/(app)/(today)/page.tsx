@@ -76,7 +76,7 @@ export default async function TodayPage() {
                 key={d}
                 title={formatDay(d)}
                 className={`flex h-6 flex-1 items-end justify-center rounded-md pb-0.5 text-[9px] font-semibold ${
-                  loggedDays.has(d) ? "gradient-accent text-white" : "bg-surface-2 text-faint"
+                  loggedDays.has(d) ? "bg-accent text-white dark:text-[#111110]" : "bg-surface-2 text-faint"
                 } ${d === today ? "ring-2 ring-accent/40 ring-offset-1 ring-offset-surface" : ""}`}
               >
                 {weekdayName(d).slice(0, 1)}

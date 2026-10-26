@@ -21,7 +21,7 @@ export function categoryStyle(name: string | null | undefined): CategoryStyle {
 export const KIND = {
   done: { label: "Done", soft: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400", ring: "ring-emerald-500/30" },
   todo: { label: "To-do", soft: "bg-amber-500/10 text-amber-600 dark:text-amber-400", ring: "ring-amber-500/30" },
-  event: { label: "Event", soft: "bg-violet-500/10 text-violet-600 dark:text-violet-400", ring: "ring-violet-500/30" },
+  event: { label: "Event", soft: "bg-sky-500/10 text-sky-600 dark:text-sky-400", ring: "ring-sky-500/30" },
 } as const;
 
 export const STATUS = {
@@ -30,16 +30,17 @@ export const STATUS = {
   shipped: { label: "Shipped", soft: "bg-sky-500/10 text-sky-700 dark:text-sky-300", dot: "bg-sky-500" },
 } as const;
 
+// Soft tinted tiles, one hue per project, picked from the name.
 const AVATARS = [
-  "from-violet-500 to-fuchsia-500",
-  "from-sky-500 to-indigo-500",
-  "from-emerald-500 to-teal-500",
-  "from-amber-500 to-orange-500",
-  "from-pink-500 to-rose-500",
-  "from-cyan-500 to-blue-500",
+  "bg-sky-500/15 text-sky-700 dark:text-sky-300",
+  "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300",
+  "bg-amber-500/15 text-amber-700 dark:text-amber-300",
+  "bg-rose-500/15 text-rose-700 dark:text-rose-300",
+  "bg-teal-500/15 text-teal-700 dark:text-teal-300",
+  "bg-orange-500/15 text-orange-700 dark:text-orange-300",
 ];
 
-export function avatarGradient(name: string): string {
+export function avatarTone(name: string): string {
   let h = 0;
   for (const ch of name) h = (h * 13 + ch.charCodeAt(0)) >>> 0;
   return AVATARS[h % AVATARS.length];

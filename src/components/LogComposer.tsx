@@ -134,10 +134,9 @@ export default function LogComposer({ defaultDate, categories, projects, openIte
     return (
       <div className="space-y-4">
         <section className="card relative overflow-hidden p-0">
-          <div className="gradient-accent pointer-events-none absolute -top-24 -right-24 size-56 rounded-full opacity-[0.12] blur-3xl" />
           <div className="relative flex flex-wrap items-center justify-between gap-3 px-5 pt-5">
             <div className="flex items-center gap-3">
-              <span className="gradient-accent flex size-9 items-center justify-center rounded-xl text-white">
+              <span className="flex size-9 items-center justify-center rounded-xl bg-ink text-bg">
                 <Sparkles className="size-4" />
               </span>
               <div>

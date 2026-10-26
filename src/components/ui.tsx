@@ -1,7 +1,7 @@
 import type { LucideIcon } from "lucide-react";
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { avatarGradient, categoryStyle } from "@/lib/ui";
+import { avatarTone, categoryStyle } from "@/lib/ui";
 
 export function PageHeader({
   eyebrow,
@@ -106,7 +106,7 @@ export function CategoryChip({ name }: { name: string }) {
 export function ProjectAvatar({ name, size = "md" }: { name: string; size?: "sm" | "md" | "lg" }) {
   const cls = { sm: "size-5 rounded-md text-[10px]", md: "size-10 rounded-xl text-sm", lg: "size-14 rounded-2xl text-xl" }[size];
   return (
-    <span className={`flex shrink-0 items-center justify-center bg-gradient-to-br font-semibold text-white ${avatarGradient(name)} ${cls}`}>
+    <span className={`flex shrink-0 items-center justify-center font-semibold ${avatarTone(name)} ${cls}`}>
       {name.slice(0, 1).toUpperCase()}
     </span>
   );

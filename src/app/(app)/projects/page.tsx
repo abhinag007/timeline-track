@@ -67,7 +67,7 @@ export default async function ProjectsPage() {
                       <span className="font-medium text-ink">{pct}%</span>
                     </div>
                     <div className="h-1.5 overflow-hidden rounded-full bg-surface-2">
-                      <div className="gradient-accent h-full rounded-full" style={{ width: `${pct}%` }} />
+                      <div className="h-full rounded-full bg-accent" style={{ width: `${pct}%` }} />
                     </div>
                   </div>
 

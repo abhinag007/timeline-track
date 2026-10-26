@@ -160,10 +160,9 @@ export default function RoadmapComposer({ today }: { today: string }) {
     return (
       <div className="space-y-4">
         <section className="card relative overflow-hidden p-0">
-          <div className="gradient-accent pointer-events-none absolute -top-24 -right-24 size-56 rounded-full opacity-[0.12] blur-3xl" />
           <div className="relative flex flex-wrap items-center justify-between gap-3 px-5 pt-5">
             <div className="flex items-center gap-3">
-              <span className="gradient-accent flex size-9 items-center justify-center rounded-xl text-white">
+              <span className="flex size-9 items-center justify-center rounded-xl bg-ink text-bg">
                 <Sparkles className="size-4" />
               </span>
               <div>
@@ -393,7 +392,7 @@ function PhaseCard({
   return (
     <li className="card p-0">
       <div className="flex items-center gap-3 p-4">
-        <span className="gradient-accent flex size-8 shrink-0 items-center justify-center rounded-lg text-sm font-semibold text-white">{index + 1}</span>
+        <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-ink text-sm font-semibold text-bg">{index + 1}</span>
         <input
           value={phase.title}
           onChange={(e) => onChange({ title: e.target.value })}

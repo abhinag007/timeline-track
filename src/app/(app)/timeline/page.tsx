@@ -106,7 +106,7 @@ export default async function TimelinePage({ searchParams }: PageProps<"/timelin
               <div className="relative z-10 w-14 shrink-0 sm:w-16">
                 <div
                   className={`flex flex-col items-center rounded-2xl border py-2 ${
-                    isToday ? "gradient-accent border-transparent text-white shadow-card" : "border-line bg-surface"
+                    isToday ? "border-transparent bg-ink text-bg shadow-card" : "border-line bg-surface"
                   }`}
                 >
                   <span className={`text-[10px] font-semibold uppercase ${isToday ? "text-white/80" : "text-faint"}`}>{weekdayName(day).slice(0, 3)}</span>

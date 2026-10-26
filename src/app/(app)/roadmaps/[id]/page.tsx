@@ -44,7 +44,7 @@ export default async function RoadmapPage({ params }: PageProps<"/roadmaps/[id]"
         </Link>
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div className="flex min-w-0 items-start gap-4">
-            <span className="gradient-accent flex size-14 shrink-0 items-center justify-center rounded-2xl text-white shadow-card">
+            <span className="flex size-14 shrink-0 items-center justify-center rounded-2xl bg-ink text-bg shadow-card">
               <MapIcon className="size-6" />
             </span>
             <div className="min-w-0">
@@ -100,7 +100,7 @@ export default async function RoadmapPage({ params }: PageProps<"/roadmaps/[id]"
                 <summary className="flex cursor-pointer list-none items-center gap-3 p-4 sm:p-5">
                   <span
                     className={`flex size-8 shrink-0 items-center justify-center rounded-lg text-sm font-semibold ${
-                      phaseDone === phase.steps.length ? "bg-emerald-500 text-white" : isCurrent ? "gradient-accent text-white" : "bg-surface-2 text-muted ring-1 ring-line"
+                      phaseDone === phase.steps.length ? "bg-emerald-500 text-white" : isCurrent ? "bg-ink text-bg" : "bg-surface-2 text-muted ring-1 ring-line"
                     }`}
                   >
                     {phaseDone === phase.steps.length ? <Check className="size-4" strokeWidth={3} /> : p + 1}
@@ -109,7 +109,7 @@ export default async function RoadmapPage({ params }: PageProps<"/roadmaps/[id]"
                     <h2 className="font-semibold">{phase.title}</h2>
                     <div className="mt-1.5 flex items-center gap-2">
                       <div className="h-1 w-24 overflow-hidden rounded-full bg-surface-2">
-                        <div className="gradient-accent h-full" style={{ width: `${(phaseDone / phase.steps.length) * 100}%` }} />
+                        <div className="h-full bg-accent" style={{ width: `${(phaseDone / phase.steps.length) * 100}%` }} />
                       </div>
                       <span className="text-xs text-faint">
                         {phaseDone}/{plural(phase.steps.length, "step")}

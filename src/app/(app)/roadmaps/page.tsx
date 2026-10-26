@@ -45,7 +45,7 @@ export default async function RoadmapsPage() {
               <li key={r.id}>
                 <Link href={`/roadmaps/${r.id}`} className="card group flex h-full flex-col gap-5 transition hover:-translate-y-0.5 hover:border-line-strong">
                   <div className="flex items-start gap-3">
-                    <span className="gradient-accent flex size-10 shrink-0 items-center justify-center rounded-xl text-white">
+                    <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-ink text-bg">
                       <MapIcon className="size-5" />
                     </span>
                     <div className="min-w-0 flex-1">
@@ -63,7 +63,7 @@ export default async function RoadmapsPage() {
                       <span className="font-medium text-ink">{pct}%</span>
                     </div>
                     <div className="h-1.5 overflow-hidden rounded-full bg-surface-2">
-                      <div className="gradient-accent h-full rounded-full" style={{ width: `${pct}%` }} />
+                      <div className="h-full rounded-full bg-accent" style={{ width: `${pct}%` }} />
                     </div>
                   </div>
 
