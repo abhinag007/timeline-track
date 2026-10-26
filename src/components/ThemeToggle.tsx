@@ -2,10 +2,6 @@
 
 import { Moon, Sun } from "lucide-react";
 
-// Runs in <head> before first paint: a saved choice wins, otherwise follow the
-// system setting (and keep following it until the user picks one).
-export const THEME_SCRIPT = `(function(){try{var d=document.documentElement,m=matchMedia("(prefers-color-scheme: dark)");function a(){d.dataset.theme=localStorage.getItem("theme")||(m.matches?"dark":"light")}a();m.addEventListener("change",a)}catch(e){}})()`;
-
 // Both icons are rendered and CSS shows the right one, so the server HTML
 // never has to know the theme.
 export default function ThemeToggle({ className = "icon-btn" }: { className?: string }) {
