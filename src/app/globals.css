@@ -1,9 +1,13 @@
 @import "tailwindcss";
 
+/* Dark mode follows data-theme on <html>, set before paint by the script in
+   app/layout.tsx (saved choice, else the system setting). */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
 /* Radix Sand (warm neutral) + Radix Green (one accent). Neutral surfaces, ink for
    primary actions, green only where something is "on": progress, today, focus. */
 :root {
-  color-scheme: light dark;
+  color-scheme: light;
   --bg: #f9f9f8;
   --surface: #fdfdfc;
   --surface-2: #f1f0ef;
@@ -18,21 +22,20 @@
   --shadow: 0 1px 2px rgb(33 32 28 / 0.05), 0 8px 24px -12px rgb(33 32 28 / 0.1);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #111110;
-    --surface: #191918;
-    --surface-2: #222221;
-    --line: #31312e;
-    --line-strong: #494844;
-    --ink: #eeeeec;
-    --muted: #b5b3ad;
-    --faint: #7c7b74;
-    --accent: #3dd68c;
-    --accent-soft: #132d21;
-    --accent-ink: #3dd68c;
-    --shadow: 0 1px 2px rgb(0 0 0 / 0.4), 0 8px 24px -12px rgb(0 0 0 / 0.6);
-  }
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #111110;
+  --surface: #191918;
+  --surface-2: #222221;
+  --line: #31312e;
+  --line-strong: #494844;
+  --ink: #eeeeec;
+  --muted: #b5b3ad;
+  --faint: #7c7b74;
+  --accent: #3dd68c;
+  --accent-soft: #132d21;
+  --accent-ink: #3dd68c;
+  --shadow: 0 1px 2px rgb(0 0 0 / 0.4), 0 8px 24px -12px rgb(0 0 0 / 0.6);
 }
 
 @theme inline {

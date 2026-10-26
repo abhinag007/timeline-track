@@ -6,6 +6,7 @@ import { SidebarNav, SidebarNavList, TabBar, TabBarList } from "@/components/Nav
 import { LogoTile } from "@/components/Logo";
 import { PageSkeleton } from "@/components/ui";
 import SubmitButton from "@/components/SubmitButton";
+import ThemeToggle from "@/components/ThemeToggle";
 
 function Logo() {
   return (
@@ -38,23 +39,29 @@ export default function AppLayout({ children }: LayoutProps<"/">) {
             <p className="text-sm font-medium">End-of-day ritual</p>
             <p className="mt-1 text-xs leading-relaxed text-muted">Write one messy paragraph. Claude turns it into done items, to-dos and events.</p>
           </div>
-          <form action={logout}>
-            <SubmitButton className="btn-ghost w-full justify-start px-3 py-2.5">
-              <LogOut className="size-4" />
-              Sign out
-            </SubmitButton>
-          </form>
+          <div className="flex items-center gap-1">
+            <form action={logout} className="flex-1">
+              <SubmitButton className="btn-ghost w-full justify-start px-3 py-2.5">
+                <LogOut className="size-4" />
+                Sign out
+              </SubmitButton>
+            </form>
+            <ThemeToggle />
+          </div>
         </div>
       </aside>
 
       <div className="flex min-w-0 flex-1 flex-col">
         <header className="sticky top-0 z-20 flex items-center justify-between border-b border-line bg-bg/80 px-4 py-3 backdrop-blur-xl lg:hidden">
           <Logo />
-          <form action={logout}>
-            <SubmitButton className="icon-btn" title="Sign out" aria-label="Sign out">
-              <LogOut className="size-4" />
-            </SubmitButton>
-          </form>
+          <div className="flex items-center gap-1">
+            <ThemeToggle />
+            <form action={logout}>
+              <SubmitButton className="icon-btn" title="Sign out" aria-label="Sign out">
+                <LogOut className="size-4" />
+              </SubmitButton>
+            </form>
+          </div>
         </header>
 
         <main className="mx-auto w-full max-w-5xl flex-1 px-4 pt-6 pb-32 sm:px-6 lg:px-10 lg:pt-10 lg:pb-16">

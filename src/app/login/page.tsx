@@ -4,6 +4,7 @@ import { ArrowRight, CalendarClock, CheckCircle2, Circle, Loader2 } from "lucide
 import { useActionState } from "react";
 import { login } from "@/app/actions";
 import { LogoTile } from "@/components/Logo";
+import ThemeToggle from "@/components/ThemeToggle";
 
 const SAMPLE = [
   { icon: CheckCircle2, tone: "bg-emerald-500/15 text-emerald-300", title: "Fixed the token refresh bug", tag: "Building" },
@@ -42,7 +43,8 @@ export default function LoginPage() {
         <p className="relative text-xs text-[#7c7b74]">Late nights count: days roll over at 4 AM</p>
       </div>
 
-      <main className="flex items-center justify-center px-5 py-12">
+      <main className="relative flex items-center justify-center px-5 py-12">
+        <ThemeToggle className="icon-btn absolute top-4 right-4" />
         <form action={action} className="w-full max-w-sm space-y-6">
           <div>
             <div className="mb-6 lg:hidden">
