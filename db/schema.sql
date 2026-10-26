@@ -130,3 +130,11 @@ create table item_tags (
   tag_id uuid not null references tags(id) on delete cascade,
   primary key (item_id, tag_id)
 );
+
+-- One row per "Try the demo" click, to rate-limit demos per visitor. The IP is
+-- stored only as a salted hash, and rows older than a day are pruned.
+create table demo_starts (
+  ip_hash text not null,
+  created_at timestamptz not null default now()
+);
+create index demo_starts_ip_idx on demo_starts (ip_hash, created_at);

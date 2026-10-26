@@ -1,5 +1,5 @@
 import "server-only";
-import { randomBytes, randomUUID } from "node:crypto";
+import { createHash, randomBytes, randomUUID } from "node:crypto";
 import bcrypt from "bcryptjs";
 import { sql } from "./db";
 import { addDays, logicalToday } from "./dates";
@@ -8,6 +8,8 @@ import { addDays, logicalToday } from "./dates";
 // deleted after DEMO_HOURS, and the visitor brings their own Claude API key.
 export const DEMO_HOURS = 24;
 const MAX_ACTIVE_DEMOS = 300;
+// Per visitor (IP address), so one script can't use up every slot.
+const DEMOS_PER_IP_PER_HOUR = 5;
 const CUTOFF = 4;
 
 export class DemoError extends Error {}
@@ -74,10 +76,15 @@ export function safeTimezone(tz: string): string {
   }
 }
 
-export async function createDemoUser(timezone: string) {
+export async function createDemoUser(timezone: string, ip: string) {
   await sql`delete from users where is_demo and expires_at < now()`;
+  await sql`delete from demo_starts where created_at < now() - interval '1 day'`;
+  const ipHash = createHash("sha256").update(`${process.env.SESSION_SECRET}:demo-ip:${ip}`).digest("base64url");
+  const [{ recent }] = await sql`select count(*)::int as recent from demo_starts where ip_hash = ${ipHash} and created_at > now() - interval '1 hour'`;
+  if (recent >= DEMOS_PER_IP_PER_HOUR) throw new DemoError("You've started a few demos in the last hour. Try again a bit later.");
   const [{ active }] = await sql`select count(*)::int as active from users where is_demo`;
   if (active >= MAX_ACTIVE_DEMOS) throw new DemoError("The demo is busy right now. Try again in a little while.");
+  await sql`insert into demo_starts (ip_hash) values (${ipHash})`;
 
   const userId = randomUUID();
   const expiresAt = new Date(Date.now() + DEMO_HOURS * 3_600_000);

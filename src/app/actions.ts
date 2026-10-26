@@ -4,6 +4,7 @@ import { randomUUID } from "node:crypto";
 import Anthropic from "@anthropic-ai/sdk";
 import bcrypt from "bcryptjs";
 import { revalidatePath } from "next/cache";
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { sql } from "@/lib/db";
@@ -56,7 +57,9 @@ export async function startDemo(_state: LoginState, formData: FormData): Promise
   if (previous?.demo) await deleteDemoUser(previous.userId);
   let user;
   try {
-    user = await createDemoUser(safeTimezone(String(formData.get("tz") ?? "UTC")));
+    // Vercel sets x-forwarded-for; its first entry is the visitor's address.
+    const ip = (await headers()).get("x-forwarded-for")?.split(",")[0].trim() || "unknown";
+    user = await createDemoUser(safeTimezone(String(formData.get("tz") ?? "UTC")), ip);
   } catch (error) {
     if (error instanceof DemoError) return { error: error.message };
     throw error;
