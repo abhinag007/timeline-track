@@ -8,14 +8,18 @@ Made for developers: side projects, open-source work, interview prep and learnin
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fabhinag007%2Ftimeline-track&env=DATABASE_URL,SESSION_SECRET,ANTHROPIC_API_KEY&envDescription=Neon%20connection%20string%2C%20a%20random%20session%20secret%20and%20an%20Anthropic%20API%20key&envLink=https%3A%2F%2Fgithub.com%2Fabhinag007%2Ftimeline-track%23run-it-locally&project-name=timeline-track&repository-name=timeline-track)
 
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="docs/screenshots/review-dark.png">
-  <img alt="A messy end-of-day paragraph split into structured, editable items" src="docs/screenshots/review-light.png">
-</picture>
+<img alt="Typing a messy end-of-day paragraph and Claude splitting it into done items, a to-do and an event" src="docs/demo.gif">
 
 Built with Next.js 16, Neon Postgres, Tailwind CSS v4 and the Anthropic API (Claude Opus 5.5). Free for personal, non-commercial use.
 
 ## Screenshots
+
+**Review**: every item Claude proposes is editable before it's saved.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/screenshots/review-dark.png">
+  <img alt="A messy end-of-day paragraph split into structured, editable items" src="docs/screenshots/review-light.png">
+</picture>
 
 **Timeline**: a GitHub-style activity heatmap, streaks, and every logged day.
 
