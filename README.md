@@ -10,7 +10,7 @@ Made for developers: side projects, open-source work, interview prep and learnin
 
 <img alt="Typing a messy end-of-day paragraph and Claude splitting it into done items, a to-do and an event" src="docs/demo.gif">
 
-Built with Next.js 16, Neon Postgres, Tailwind CSS v4 and the Anthropic API (Claude Opus 5.5). Free for personal, non-commercial use.
+Built with Next.js 16, Neon Postgres, Tailwind CSS v4 and the Anthropic API (Claude Opus 5.5). Open source under the MIT License.
 
 ## Screenshots
 
@@ -145,9 +145,6 @@ At one or two logs a day on Claude Opus 5.5, expect about $4 a month of API usag
 
 ## License
 
-[PolyForm Noncommercial 1.0.0](LICENSE). In short:
+[MIT](LICENSE). You are free to use, copy, modify and distribute this project, including for commercial purposes, as long as you keep the copyright notice.
 
-- **Allowed:** using, copying and changing it for yourself, for study, hobby projects and other non-commercial purposes, and use by non-profits and schools.
-- **Not allowed:** any commercial use, such as selling it, offering it as a paid service, or building a product on it to make money.
-
-Want to use it commercially? [Open an issue](https://github.com/abhinag007/timeline-track/issues) to ask about a commercial license.
+Contributions are welcome. Open an [issue](https://github.com/abhinag007/timeline-track/issues) or a pull request.
