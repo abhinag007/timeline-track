@@ -38,6 +38,7 @@ type Draft = {
   stepId: string;
   checklistIds: string[];
   closesIds: string[];
+  updatesId: string;
 };
 
 type StepChange = Proposal["step_status_changes"][number] & { accepted: boolean };
@@ -58,6 +59,7 @@ function toDraft(item: Proposal["items"][number], i: number): Draft {
     stepId: item.roadmap_step_id ?? "",
     checklistIds: item.checklist_item_ids,
     closesIds: item.closes_open_item_ids,
+    updatesId: item.updates_open_item_id ?? "",
   };
 }
 
@@ -123,6 +125,7 @@ export default function LogComposer({ defaultDate, categories, projects, openIte
           roadmap_step_id: d.stepId || null,
           checklist_item_ids: d.kind === "done" ? d.checklistIds : [],
           closes_open_item_ids: d.kind === "done" ? d.closesIds : [],
+          updates_open_item_id: d.kind !== "done" && d.updatesId ? d.updatesId : null,
         })),
         stepStatusChanges: stepChanges
           .filter((c) => c.accepted)
@@ -252,7 +255,7 @@ export default function LogComposer({ defaultDate, categories, projects, openIte
         onClick={() =>
           setDrafts((ds) => [
             ...(ds ?? []),
-            { key: `${Date.now()}`, kind: "done", title: "", category: categories[0], tags: "", duration: "", dueDate: "", project: "", stepId: "", checklistIds: [], closesIds: [] },
+            { key: `${Date.now()}`, kind: "done", title: "", category: categories[0], tags: "", duration: "", dueDate: "", project: "", stepId: "", checklistIds: [], closesIds: [], updatesId: "" },
           ])
         }
       >
@@ -471,6 +474,21 @@ function DraftCard({
           selected={d.checklistIds}
           onChange={(checklistIds) => onChange({ checklistIds })}
         />
+      )}
+
+      {d.kind !== "done" && openItems.length > 0 && (
+        <label className="block">
+          <span className="label">Updates planned item</span>
+          <select value={d.updatesId} onChange={(e) => onChange({ updatesId: e.target.value })} className="select">
+            <option value="">None, add as new</option>
+            {openItems.map((o) => (
+              <option key={o.id} value={o.id}>
+                {o.title}
+                {o.due_date ? ` (${o.due_date})` : ""}
+              </option>
+            ))}
+          </select>
+        </label>
       )}
 
       {d.kind === "done" && openItems.length > 0 && (

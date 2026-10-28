@@ -164,6 +164,17 @@ export async function saveEntry(input: SaveInput): Promise<{ error: string } | v
     rows.forEach((r) => tagId.set(r.name as string, r.id as string));
   }
 
+  // Items that replace an open todo or event must still be open and the user's own.
+  const updateIds = items.flatMap((i) => (i.kind !== "done" && i.updates_open_item_id ? [i.updates_open_item_id] : []));
+  const updatable = new Set<string>();
+  if (updateIds.length) {
+    const rows = await sql`
+      select id from items
+      where user_id = ${userId} and id = any(${updateIds}::uuid[]) and kind in ('todo', 'event') and closed_on is null
+    `;
+    rows.forEach((r) => updatable.add(r.id as string));
+  }
+
   const entryId = randomUUID();
   const queries = [sql`insert into entries (id, user_id, entry_date, raw_text) values (${entryId}, ${userId}, ${entryDate}, ${rawText})`];
 
@@ -177,7 +188,9 @@ export async function saveEntry(input: SaveInput): Promise<{ error: string } | v
   }
 
   for (const item of items) {
-    const itemId = randomUUID();
+    const updatesId = item.kind !== "done" && item.updates_open_item_id && updatable.has(item.updates_open_item_id) ? item.updates_open_item_id : null;
+    updatable.delete(updatesId ?? "");
+    const itemId = updatesId ?? randomUUID();
     const newName = item.new_project_name?.trim().toLowerCase();
     const projectId =
       item.project_id && projectIds.has(item.project_id)
@@ -187,16 +200,30 @@ export async function saveEntry(input: SaveInput): Promise<{ error: string } | v
           : null;
     const due = item.kind === "done" || !item.due_date || !isIsoDate(item.due_date) ? null : item.due_date;
 
-    queries.push(sql`
-      insert into items (id, user_id, entry_id, entry_date, kind, title, category_id, project_id,
-                         roadmap_step_id, duration_minutes, due_date)
-      select ${itemId}, ${userId}, ${entryId}, ${entryDate}, ${item.kind}, ${item.title.trim()},
-             ${categoryId.get(item.category) ?? null}, ${projectId},
-             (select s.id from roadmap_steps s join roadmap_phases ph on ph.id = s.phase_id
-                join roadmaps r on r.id = ph.roadmap_id
-               where s.id = ${item.roadmap_step_id}::uuid and r.user_id = ${userId}),
-             ${item.duration_minutes}, ${due}
-    `);
+    if (updatesId) {
+      // A postponed or changed todo/event is edited in place, keeping the day it was first logged.
+      queries.push(sql`
+        update items set kind = ${item.kind}, title = ${item.title.trim()},
+               category_id = ${categoryId.get(item.category) ?? null}, project_id = ${projectId},
+               roadmap_step_id = (select s.id from roadmap_steps s join roadmap_phases ph on ph.id = s.phase_id
+                                    join roadmaps r on r.id = ph.roadmap_id
+                                   where s.id = ${item.roadmap_step_id}::uuid and r.user_id = ${userId}),
+               due_date = ${due}
+        where id = ${itemId} and user_id = ${userId}
+      `);
+      queries.push(sql`delete from item_tags where item_id = ${itemId}`);
+    } else {
+      queries.push(sql`
+        insert into items (id, user_id, entry_id, entry_date, kind, title, category_id, project_id,
+                           roadmap_step_id, duration_minutes, due_date)
+        select ${itemId}, ${userId}, ${entryId}, ${entryDate}, ${item.kind}, ${item.title.trim()},
+               ${categoryId.get(item.category) ?? null}, ${projectId},
+               (select s.id from roadmap_steps s join roadmap_phases ph on ph.id = s.phase_id
+                  join roadmaps r on r.id = ph.roadmap_id
+                 where s.id = ${item.roadmap_step_id}::uuid and r.user_id = ${userId}),
+               ${item.duration_minutes}, ${due}
+      `);
+    }
     for (const name of new Set(item.tags)) {
       const id = tagId.get(name);
       if (id) queries.push(sql`insert into item_tags (item_id, tag_id) values (${itemId}, ${id})`);

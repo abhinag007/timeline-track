@@ -21,6 +21,7 @@ export const ProposalSchema = z.object({
       roadmap_step_id: z.string().nullable(),
       checklist_item_ids: z.array(z.string()),
       closes_open_item_ids: z.array(z.string()),
+      updates_open_item_id: z.string().nullable(),
     }),
   ),
   step_status_changes: z.array(
@@ -65,6 +66,7 @@ For each item decide:
 - roadmap_step_id: the id of a roadmap step only when the item clearly works on that step. Most items match no step; use null then.
 - checklist_item_ids: ids of checklist items this done item clearly completes. Empty for todos and events.
 - closes_open_item_ids: ids of open todos or events this done item clearly completes or that have clearly happened. Only close when the log makes that plain.
+- updates_open_item_id: for todos and events only. When the log changes something that is already an open item (postponed, rescheduled, moved to another time or day, renamed, more details given) rather than introducing a new one, return that open item's id here. The item then replaces the open one instead of being added again, so give its full new title, due_date, category, tags and project, not just the change. When an event is postponed, also update any open todo that prepares for it, so its due date moves with the event. Never point two items at the same open item. null when the item is new. Always null for done items.
 
 Also return step_status_changes: suggest "in_progress" when work starts on a step that has not started, and "done" only when the log says the step is finished. Give a short reason. Usually this list is empty.
 
@@ -149,6 +151,14 @@ function sanitize(proposal: Proposal, ctx: SplitContext): Proposal {
   const stepIds = new Set(ctx.steps.map((s) => s.id));
   const checklistIds = new Set(ctx.checklist.map((c) => c.id));
   const isDate = (d: string | null) => (d && /^\d{4}-\d{2}-\d{2}$/.test(d) ? d : null);
+  // Each open item can be replaced by at most one new item.
+  const claimed = new Set<string>();
+  const claimUpdate = (item: Proposal["items"][number]) => {
+    const id = item.updates_open_item_id;
+    if (item.kind === "done" || !id || !openIds.has(id) || claimed.has(id)) return null;
+    claimed.add(id);
+    return id;
+  };
 
   return {
     items: proposal.items.map((item) => ({
@@ -162,6 +172,7 @@ function sanitize(proposal: Proposal, ctx: SplitContext): Proposal {
       roadmap_step_id: item.roadmap_step_id && stepIds.has(item.roadmap_step_id) ? item.roadmap_step_id : null,
       checklist_item_ids: item.checklist_item_ids.filter((id) => checklistIds.has(id)),
       closes_open_item_ids: item.closes_open_item_ids.filter((id) => openIds.has(id)),
+      updates_open_item_id: claimUpdate(item),
     })),
     step_status_changes: proposal.step_status_changes.filter((c) => stepIds.has(c.step_id)),
   };
